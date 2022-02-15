@@ -1,13 +1,14 @@
 {
   "ServerConfig": {
-    "NumOfMapWorkers":1000,
-    "NumOfQueueConsumers":32
+    "NumOfMapWorkers":32,
+    "NumOfQueueConsumers":100,
+    "ChannelSize": 1000
   },
   "SqsConfig": {
     "QueueUrl": "https://sqs.us-east-1.amazonaws.com/853749279931/map_queue",
     "MaxNumberOfMessages": 10,
     "WaitTimeSeconds": 0,
-    "VisibilityTimeout":60
+    "VisibilityTimeout":120
   },
   "LogsConfig": {
     "LogFilePath": "./log.txt"

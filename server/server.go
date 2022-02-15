@@ -19,9 +19,9 @@ func Serve() {
 	once.Do(func() {
 		configs, _ := config.GetConfigs()
 		serverConfig := configs.ServerConfig
-		msgChan := make(chan *string, serverConfig.NumOfMapWorkers)
+		msgChan := make(chan *string, serverConfig.ChannelSize)
 		parser := parser.MakeJsonParser()
-		storage := storage.MakeMapStorage()
+		storage := storage.MakeSkipmapStorageStorage()
 		logger := logger.MakeFileLogger(configs.LogsConfig.LogFilePath)
 		runMapWorkers(serverConfig.NumOfMapWorkers, msgChan, parser, storage, logger)
 		runMessageQueueConsumers(serverConfig.NumOfQueueConsumers, msgChan, configs.SqsConfig)

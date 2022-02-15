@@ -69,7 +69,7 @@ func (m *mapOperationsWorker) executeOperation(operation parser.IMapOperation)(s
 			}
 			return fmt.Sprintf("got key:value - {%s : %s}", key, val), nil
 		case parser.GetAll:
-			allItems := m.storage.GetAllItems()
+			allItems := m.storage.GetAllItemsByOrder()
 			return fmt.Sprintf("all items - %s", allItems), nil
 		default:
 			return "", fmt.Errorf("invalid operation - %v", operation.OperationType())

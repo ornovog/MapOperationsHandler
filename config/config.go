@@ -15,6 +15,7 @@ type Configuration struct {
 type ServerConfig struct{
 	NumOfMapWorkers     int
 	NumOfQueueConsumers	int
+	ChannelSize			int
 }
 
 type SqsConfig struct{

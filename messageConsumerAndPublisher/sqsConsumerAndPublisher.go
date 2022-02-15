@@ -42,21 +42,23 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 			log.Printf("error when consuming - %s\n", err.Error())
 		}
 
+		msgsToDelete := make([]*sqs.Message, 0)
 		for _, msg := range output.Messages {
 			if !didMessageConsumeBefore(msg) {
-				s.msgChan <- msg.Body
+				select {
+				case s.msgChan <- msg.Body:
+					msgsToDelete = append(msgsToDelete, msg)
+				default:
+				}
 			}
 		}
 
-		s.deleteMessages(output.Messages)
+		s.deleteMessages(msgsToDelete)
 	}
 }
 
 func didMessageConsumeBefore(msg *sqs.Message) bool{
 	msgReceiveCountStr := msg.Attributes[sqs.MessageSystemAttributeNameApproximateReceiveCount]
-	if msgReceiveCountStr == nil{
-		return false
-	}
 	msgReceiveCount, _ := strconv.Atoi(*msgReceiveCountStr)
 	return msgReceiveCount > 1
 }
@@ -66,20 +68,35 @@ func (s *sqsConsumerAndPublisher) deleteMessages(messages []*sqs.Message){
 		QueueUrl:      &s.sqsConfig.QueueUrl,
 	}
 
-	var wg sync.WaitGroup
 	for _, msg := range messages {
-		wg.Add(1)
 		deleteMessageInput.ReceiptHandle = msg.ReceiptHandle
-		go func() {
-			_, err := s.sqsClient.DeleteMessage(deleteMessageInput)
-			if err != nil {
-				log.Printf("error when deleting - %s\n", err.Error())
-			}
-			wg.Done()
-		}()
+		_, err := s.sqsClient.DeleteMessage(deleteMessageInput)
+		if err != nil {
+			log.Printf("error when deleting - %s\n", err.Error())
+		}
 	}
-	wg.Wait()
 }
+
+//func (s *sqsConsumerAndPublisher) deleteMessages(messages []*sqs.Message){
+//	deleteMessageInput := &sqs.DeleteMessageInput{
+//		QueueUrl:      &s.sqsConfig.QueueUrl,
+//	}
+//
+//	var wg sync.WaitGroup
+//	for _, msg := range messages {
+//		wg.Add(1)
+//		deleteMessageInput.ReceiptHandle = msg.ReceiptHandle
+//		go func(){
+//			_, err := s.sqsClient.DeleteMessage(deleteMessageInput)
+//			if err != nil {
+//				log.Printf("error when deleting - %s\n", err.Error())
+//			}
+//			wg.Done()
+//		}()
+//	}
+//	wg.Wait()
+//
+// }
 
 
 func MakeSqsConsumerAndPublisher(msgChan chan *string, sqsConfig config.SqsConfig) IMessagesConsumerAndPublisher{
