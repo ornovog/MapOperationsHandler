@@ -44,7 +44,7 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 
 		msgsToDelete := make([]*sqs.Message, 0)
 		for _, msg := range output.Messages {
-			if !didMessageConsumeBefore(msg) {
+			if !messageConsumedBefore(msg) {
 				select {
 				case s.msgChan <- msg.Body:
 					msgsToDelete = append(msgsToDelete, msg)
@@ -59,7 +59,7 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 	}
 }
 
-func didMessageConsumeBefore(msg *sqs.Message) bool{
+func messageConsumedBefore(msg *sqs.Message) bool{
 	msgReceiveCountStr := msg.Attributes[sqs.MessageSystemAttributeNameApproximateReceiveCount]
 	msgReceiveCount, _ := strconv.Atoi(*msgReceiveCountStr)
 	return msgReceiveCount > 1
