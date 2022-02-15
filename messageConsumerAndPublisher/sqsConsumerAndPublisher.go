@@ -78,7 +78,6 @@ func (s *sqsConsumerAndPublisher) deleteMessages(messages []*sqs.Message){
 
 	for _, failed := range output.Failed{
 		log.Printf("error when deleting - %s\n", *failed.Message)
-		return
 	}
 }
 
