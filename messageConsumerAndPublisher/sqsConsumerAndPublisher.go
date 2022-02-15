@@ -51,7 +51,9 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 			}
 		}
 
-		s.deleteMessages(msgsToDelete)
+		if len(msgsToDelete) > 0{
+			s.deleteMessages(msgsToDelete)
+		}
 	}
 }
 
@@ -62,39 +64,35 @@ func messageConsumedBefore(msg *sqs.Message) bool{
 }
 
 func (s *sqsConsumerAndPublisher) deleteMessages(messages []*sqs.Message){
-	deleteMessageInput := &sqs.DeleteMessageInput{
-		QueueUrl:      &s.sqsConfig.QueueUrl,
+	deleteMessagesList := messagesToDeleteMessages(messages)
+	deleteMessageInput := &sqs.DeleteMessageBatchInput{
+		Entries:  deleteMessagesList,
+		QueueUrl: &s.sqsConfig.QueueUrl,
 	}
 
-	for _, msg := range messages {
-		deleteMessageInput.ReceiptHandle = msg.ReceiptHandle
-		_, err := s.sqsClient.DeleteMessage(deleteMessageInput)
-		if err != nil {
-			log.Printf("error when deleting - %s\n", err.Error())
-		}
+	output, err := s.sqsClient.DeleteMessageBatch(deleteMessageInput)
+	if err != nil {
+		log.Printf("error when deleting - %s\n", err.Error())
+		return
+	}
+
+	for _, failed := range output.Failed{
+		log.Printf("error when deleting - %s\n", *failed.Message)
+		return
 	}
 }
 
-//func (s *sqsConsumerAndPublisher) deleteMessages(messages []*sqs.Message){
-//	deleteMessageInput := &sqs.DeleteMessageInput{
-//		QueueUrl:      &s.sqsConfig.QueueUrl,
-//	}
-//
-//	var wg sync.WaitGroup
-//	for _, msg := range messages {
-//		wg.Add(1)
-//		deleteMessageInput.ReceiptHandle = msg.ReceiptHandle
-//		go func(){
-//			_, err := s.sqsClient.DeleteMessage(deleteMessageInput)
-//			if err != nil {
-//				log.Printf("error when deleting - %s\n", err.Error())
-//			}
-//			wg.Done()
-//		}()
-//	}
-//	wg.Wait()
-//
-// }
+func messagesToDeleteMessages(messages []*sqs.Message) []*sqs.DeleteMessageBatchRequestEntry {
+	deleteMessagesList := make([]*sqs.DeleteMessageBatchRequestEntry, 0)
+	for _, msg := range messages {
+		deleteMessage := sqs.DeleteMessageBatchRequestEntry{
+			Id:            msg.MessageId,
+			ReceiptHandle: msg.ReceiptHandle,
+		}
+		deleteMessagesList = append(deleteMessagesList, &deleteMessage)
+	}
+	return deleteMessagesList
+}
 
 
 func MakeSqsConsumerAndPublisher(msgChan chan *string, sqsConfig config.SqsConfig) IMessagesConsumerAndPublisher{
