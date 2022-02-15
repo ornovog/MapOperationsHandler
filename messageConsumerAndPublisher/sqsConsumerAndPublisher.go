@@ -44,14 +44,10 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 
 		msgsToDelete := make([]*sqs.Message, 0)
 		for _, msg := range output.Messages {
-			if !messageConsumedBefore(msg) {
-				select {
-				case s.msgChan <- msg.Body:
-					msgsToDelete = append(msgsToDelete, msg)
-				default:
-				}
-			}else {
+			select {
+			case s.msgChan <- msg.Body:
 				msgsToDelete = append(msgsToDelete, msg)
+			default:
 			}
 		}
 
