@@ -1,7 +1,7 @@
 {
   "ServerConfig": {
     "NumOfMapWorkers":32,
-    "NumOfQueueConsumers":100,
+    "NumOfQueueConsumers":400,
     "ChannelSize": 1000
   },
   "SqsConfig": {

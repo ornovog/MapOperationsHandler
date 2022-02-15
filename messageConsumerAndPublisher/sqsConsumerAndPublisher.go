@@ -50,6 +50,8 @@ func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 					msgsToDelete = append(msgsToDelete, msg)
 				default:
 				}
+			}else {
+				msgsToDelete = append(msgsToDelete, msg)
 			}
 		}
 
