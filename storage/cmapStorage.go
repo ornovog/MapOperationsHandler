@@ -9,13 +9,13 @@ type cmapStorage struct {
 	cmap cmap.ConcurrentMap
 }
 
-func MakeCmapStorage() IStorage{
+/*func MakeCmapStorage() IStorage{
 	cmap := cmap.New()
 	cmapStorage := cmapStorage{
 		cmap: cmap,
 	}
 	return &cmapStorage
-}
+}*/
 
 func (ms *cmapStorage)AddItem(key string, val interface{}) error{
 	ok := ms.cmap.SetIfAbsent(key, val)

@@ -9,13 +9,13 @@ type skipmapStorage struct {
 	skipmap *skipmap.StringMap
 }
 
-func MakeSkipmapStorageStorage() IStorage{
+/*func MakeSkipmapStorageStorage() IStorage{
 	skipmap := skipmap.NewString()
 	skipmapStorage := skipmapStorage{
 		skipmap: skipmap,
 	}
 	return &skipmapStorage
-}
+}*/
 
 func (ss *skipmapStorage)AddItem(key string, val interface{}) error{
 	ss.skipmap.Store(key, val)

@@ -6,8 +6,8 @@ type keyValuePair struct {
 }
 
 type IStorage interface {
-	AddItem(key string, val interface{})error
+	AddItem(key string, val string)error
 	RemoveItem(key string)
-	GetItem(key string)(interface{}, error)
-	GetAllItemsByOrder()[]keyValuePair
+	GetItem(key string)(string, error)
+	GetAllItemsByOrder()[]string
 }

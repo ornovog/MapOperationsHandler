@@ -21,7 +21,7 @@ func Serve() {
 		serverConfig := configs.ServerConfig
 		msgChan := make(chan *string, serverConfig.ChannelSize)
 		parser := parser.MakeJsonParser()
-		storage := storage.MakeSkipmapStorageStorage()
+		storage := storage.MakeNavigationMap()
 		logger := logger.MakeFileLogger(configs.LogsConfig.LogFilePath)
 		runMapWorkers(serverConfig.NumOfMapWorkers, msgChan, parser, storage, logger)
 		runMessageQueueConsumers(serverConfig.NumOfQueueConsumers, msgChan, configs.SqsConfig)
