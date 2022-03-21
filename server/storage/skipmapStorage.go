@@ -35,7 +35,7 @@ func (ss *skipmapStorage)GetItem(key string)(interface{}, error){
 	return val.(string), nil
 }
 
-func (ss *skipmapStorage)GetAllItemsByOrder()[]keyValuePair{
+func (ss *skipmapStorage)GetAllItemsByOrder()[]keyValuePair {
 	allItems := make([]keyValuePair, 0)
 	ss.skipmap.Range(func(key string, value interface{}) bool {
 		keyValuePair := keyValuePair{Key: key, Value: value}

@@ -36,7 +36,7 @@ func GetConfigs() (Configuration, error){
 		return config, err
 	}
 
-	configFile, err := os.Open(path.Join(wd, "config/config.json"))
+	configFile, err := os.Open(path.Join(wd, "server", "config" ,"config.json"))
 	if err != nil{
 		return config, err
 	}

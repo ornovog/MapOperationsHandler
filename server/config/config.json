@@ -5,7 +5,6 @@
     "ChannelSize": 1000
   },
   "SqsConfig": {
-    "QueueUrl": "https://sqs.us-east-1.amazonaws.com/853749279931/map_queue",
     "MaxNumberOfMessages": 10,
     "WaitTimeSeconds": 0,
     "VisibilityTimeout":10

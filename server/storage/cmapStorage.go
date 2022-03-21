@@ -39,7 +39,7 @@ func (ms *cmapStorage)GetItem(key string)(interface{}, error){
 	return val.(string), nil
 }
 
-func (ms *cmapStorage)GetAllItemsByOrder()[]keyValuePair{
+func (ms *cmapStorage)GetAllItemsByOrder()[]keyValuePair {
 	allItems := make([]keyValuePair, 0)
 	for key, val := range ms.cmap.Items() {
 		keyValuePair := keyValuePair{Key: key, Value: val}

@@ -6,12 +6,12 @@ import (
 )
 
 type NavigationMap struct {
-	mu 				sync.RWMutex
-	keyToValueNode	map[string]*node
-	values 			doublyLinkedList
+	mu             sync.RWMutex
+	keyToValueNode map[string]*node
+	values         doublyLinkedList
 }
 
-func MakeNavigationMap() IStorage{
+func MakeNavigationMap() IStorage {
 	navigationMap := NavigationMap{}
 	navigationMap.values = *MakeDoublyList()
 	return &navigationMap

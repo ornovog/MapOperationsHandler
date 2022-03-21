@@ -1,20 +1,20 @@
 package operatinWorker
 
 import (
-	"MapServer/logger"
-	parser "MapServer/messageToOperationParser"
-	"MapServer/storage"
+	"MapServer/server/logger"
+	"MapServer/server/messageToOperationParser"
+	"MapServer/server/storage"
 	"fmt"
 	"log"
 	"sync"
 )
 
 type mapOperationsWorker struct {
-	messagesChannel   chan *string
-	messagesParser    parser.IMessagesParser
-	storage           storage.IStorage
-	logger            logger.ILogger
-	once 	  		  sync.Once
+	messagesChannel chan *string
+	messagesParser  messageToOperationParser.IMessagesParser
+	storage         storage.IStorage
+	logger          logger.ILogger
+	once            sync.Once
 }
 
 func (m *mapOperationsWorker) ReadMessagesAndExecuteMapOperations(){
@@ -45,9 +45,9 @@ func (m *mapOperationsWorker) handleMessage(msg *string){
 	m.logger.WriteToLog(opResult)
 }
 
-func (m *mapOperationsWorker) executeOperation(operation parser.IMapOperation)(string, error){
+func (m *mapOperationsWorker) executeOperation(operation messageToOperationParser.IMapOperation)(string, error){
 	switch operation.OperationType() {
-		case parser.Add:
+		case messageToOperationParser.Add:
 			key := operation.Key()
 			val := operation.Value()
 			err := m.storage.AddItem(key, val)
@@ -56,11 +56,11 @@ func (m *mapOperationsWorker) executeOperation(operation parser.IMapOperation)(s
 				//return "", err
 			}
 			return fmt.Sprintf("added - {%s : %s}", key, val), nil
-		case parser.Remove:
+		case messageToOperationParser.Remove:
 			key := operation.Key()
 			m.storage.RemoveItem(key)
 			return fmt.Sprintf("removed key - %s", key), nil
-		case parser.Get:
+		case messageToOperationParser.Get:
 			key := operation.Key()
 			val, err := m.storage.GetItem(key)
 			if err != nil {
@@ -68,7 +68,7 @@ func (m *mapOperationsWorker) executeOperation(operation parser.IMapOperation)(s
 				//return "", err
 			}
 			return fmt.Sprintf("got key:value - {%s : %s}", key, val), nil
-		case parser.GetAll:
+		case messageToOperationParser.GetAll:
 			allItems := m.storage.GetAllItemsByOrder()
 			return fmt.Sprintf("all items - %s", allItems), nil
 		default:
@@ -77,8 +77,8 @@ func (m *mapOperationsWorker) executeOperation(operation parser.IMapOperation)(s
 	}
 }
 
-func MakeMapOperationsWorker(messagesChanel chan *string, messagesParser parser.IMessagesParser,
-	storage storage.IStorage, logger logger.ILogger)IMapOperationsWorker{
+func MakeMapOperationsWorker(messagesChanel chan *string, messagesParser messageToOperationParser.IMessagesParser,
+	storage storage.IStorage, logger logger.ILogger) IMapOperationsWorker {
 
 	m := mapOperationsWorker{
 		messagesChannel : messagesChanel,

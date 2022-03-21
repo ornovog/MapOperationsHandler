@@ -1,14 +1,17 @@
 package messageConsumerAndPublisher
 
 import (
-	"MapServer/config"
+	"MapServer/server/config"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"log"
+	"os"
 	"strconv"
 	"sync"
 )
+
+var qURL = os.Getenv("qURL")
 
 type sqsConsumerAndPublisher struct {
 	sqsClient *sqs.SQS
@@ -29,7 +32,7 @@ func (s *sqsConsumerAndPublisher) StartConsuming(){
 
 func (s *sqsConsumerAndPublisher) consumeAndPublishMessages(){
 	receiveMessageInput := sqs.ReceiveMessageInput{
-		QueueUrl:            aws.String(s.sqsConfig.QueueUrl),
+		QueueUrl:            aws.String(qURL),
 		MaxNumberOfMessages: aws.Int64(s.sqsConfig.MaxNumberOfMessages),
 		WaitTimeSeconds:     aws.Int64(s.sqsConfig.WaitTimeSeconds),
 		AttributeNames: 	 aws.StringSlice([]string{sqs.MessageSystemAttributeNameApproximateReceiveCount}),
@@ -94,7 +97,7 @@ func messagesToDeleteMessages(messages []*sqs.Message) []*sqs.DeleteMessageBatch
 }
 
 
-func MakeSqsConsumerAndPublisher(msgChan chan *string, sqsConfig config.SqsConfig) IMessagesConsumerAndPublisher{
+func MakeSqsConsumerAndPublisher(msgChan chan *string, sqsConfig config.SqsConfig) IMessagesConsumerAndPublisher {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
